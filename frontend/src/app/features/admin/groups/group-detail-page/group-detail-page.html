@@ -1,0 +1,92 @@
+@if (group(); as currentGroup) {
+  <section class="page" aria-labelledby="page-title">
+    <a class="back-link" routerLink="/admin/groups">← Vissza a csoportokhoz</a>
+    <div class="page-heading">
+      <div>
+        <p class="eyebrow">CSOPORT ADATLAP</p>
+        <h1 id="page-title">{{ currentGroup.name }}</h1>
+        <p class="subtitle">{{ currentGroup.startDate }} · {{ currentGroup.durationWeeks }} hetes program</p>
+      </div>
+      <span class="status status-active">Aktív</span>
+    </div>
+
+    <p class="sr-only" aria-live="polite">{{ actionMessage() }}</p>
+
+    <div class="detail-grid">
+      <article class="panel">
+        <p class="eyebrow">EDZŐI STÁB</p>
+        <h2>Edzők</h2>
+        <ul class="person-list">
+          @for (coach of currentGroup.coaches; track coach.id) {
+            <li><span class="person-avatar" aria-hidden="true">{{ coach.name.slice(0, 1) }}</span><span>{{ coach.name }}</span>
+              @if (coach.id === currentGroup.leadCoach.id) { <span class="role-tag">Vezetőedző</span> }
+            </li>
+          }
+        </ul>
+      </article>
+
+      <article class="panel">
+        <p class="eyebrow">CSOPORTTAGOK</p>
+        <h2>Sportolók <span class="count">{{ currentGroup.athletes.length }}</span></h2>
+        <ul class="person-list">
+          @for (athlete of currentGroup.athletes; track athlete.id) {
+            <li><span class="person-avatar athlete-avatar" aria-hidden="true">{{ athlete.name.slice(0, 1) }}</span><span>{{ athlete.name }}</span></li>
+          }
+        </ul>
+      </article>
+    </div>
+
+    <article class="panel">
+      <div class="section-heading">
+        <div><p class="eyebrow">ISMÉTLŐDÉSI SZABÁLY</p><h2>Heti edzésrend</h2></div>
+      </div>
+      <div class="schedule-chips">
+        @for (rule of currentGroup.weeklySchedule; track rule.id) {
+          <span class="schedule-chip">{{ weekdayName(rule.weekday) }} · {{ rule.startTime }} · {{ rule.durationMinutes }} perc</span>
+        }
+      </div>
+      <p class="helper">A heti rend a csoport szabálya. Egy konkrét alkalom lemondása nem módosítja ezt a beállítást.</p>
+    </article>
+
+    <article class="panel">
+      <div class="section-heading">
+        <div><p class="eyebrow">KONKRÉT ALKALMAK</p><h2>Edzések</h2></div>
+        <span class="helper">{{ sessions().length }} alkalom a bemutató időszakban</span>
+      </div>
+      <div class="session-list">
+        @for (session of sessions(); track session.id) {
+          <div class="session-row">
+            <div class="session-date"><strong>{{ session.startsAt | date:'EEEE' : 'Europe/Budapest' }}</strong><span>{{ session.startsAt | date:'dd.MM.yyyy · HH:mm' : 'Europe/Budapest' }}</span></div>
+            <div class="session-coaches"><span class="meta-label">Edzők</span><strong>{{ coachNames(session.coaches) }}</strong></div>
+            @if (session.status === 'cancelled') {
+              <div class="cancelled-info"><span class="status status-cancelled">Lemondva</span><span>{{ session.cancellationReason }}</span></div>
+            } @else {
+              <span class="status status-scheduled">Tervezett</span>
+              <button class="button button-danger" type="button" (click)="beginCancel(session.id)">Lemondás</button>
+            }
+          </div>
+          @if (cancelingSessionId() === session.id) {
+            <div class="cancel-panel" [attr.aria-labelledby]="'cancel-title-' + session.id">
+              <label [for]="'cancel-reason-' + session.id" [id]="'cancel-title-' + session.id">Lemondás oka</label>
+              <input [id]="'cancel-reason-' + session.id" type="text" [value]="cancelReason()"
+                     (input)="updateCancelReason($event)" [attr.aria-describedby]="'cancel-error-' + session.id" />
+              <span class="field-error" [id]="'cancel-error-' + session.id" role="alert" [hidden]="!cancelError()">{{ cancelError() }}</span>
+              <div class="cancel-actions">
+                <button class="button button-secondary" type="button" (click)="cancelCancel()">Mégse</button>
+                <button class="button button-danger" type="button" (click)="confirmCancel(session.id)">Csak ezt az alkalmat mondom le</button>
+              </div>
+            </div>
+          }
+        } @empty {
+          <p class="helper">Ehhez a csoporthoz még nincsenek edzésalkalmak.</p>
+        }
+      </div>
+    </article>
+  </section>
+} @else {
+  <section class="empty-state" aria-labelledby="missing-group-title">
+    <h1 id="missing-group-title">A csoport nem található</h1>
+    <p>Lehet, hogy a csoportot törölték, vagy hibás a hivatkozás.</p>
+    <a class="button button-primary" routerLink="/admin/groups">Vissza a csoportokhoz</a>
+  </section>
+}

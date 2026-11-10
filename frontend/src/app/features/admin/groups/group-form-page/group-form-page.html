@@ -1,0 +1,131 @@
+<section class="page" aria-labelledby="page-title">
+  <a class="back-link" routerLink="/admin/groups">← Vissza a csoportokhoz</a>
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">ÚJ PROGRAM</p>
+      <h1 id="page-title">Edzéscsoport létrehozása</h1>
+      <p class="subtitle">Állítsd be a csoport alapadatait és a heti ismétlődő edzésrendet.</p>
+    </div>
+  </div>
+
+  <form class="form-card" novalidate (submit)="$event.preventDefault(); save()">
+    <fieldset class="form-section">
+      <legend>Alapadatok</legend>
+      <label class="field" for="group-name">
+        <span>Csoport neve <span aria-hidden="true">*</span></span>
+        <input id="group-name" type="text" autocomplete="off" [formField]="groupForm.name"
+               [attr.aria-invalid]="submitted() && groupForm.name().invalid()"
+               aria-describedby="group-name-error" />
+        <span id="group-name-error" class="field-error" role="alert"
+              [hidden]="!submitted() || !groupForm.name().invalid()">Adj meg egy csoportnevet.</span>
+      </label>
+
+      <div class="form-grid">
+        <label class="field" for="start-date">
+          <span>Kezdődátum <span aria-hidden="true">*</span></span>
+          <input id="start-date" type="date" [formField]="groupForm.startDate"
+                 [attr.aria-invalid]="submitted() && groupForm.startDate().invalid()"
+                 aria-describedby="start-date-error" />
+          <span id="start-date-error" class="field-error" role="alert"
+                [hidden]="!submitted() || !groupForm.startDate().invalid()">Válassz kezdődátumot.</span>
+        </label>
+        <label class="field" for="duration-weeks">
+          <span>Időtartam (hét) <span aria-hidden="true">*</span></span>
+          <input id="duration-weeks" type="number" [formField]="groupForm.durationWeeks"
+                 [attr.aria-invalid]="submitted() && groupForm.durationWeeks().invalid()"
+                 aria-describedby="duration-help duration-error" />
+          <span id="duration-help" class="field-help">1–52 hét között választható.</span>
+          <span id="duration-error" class="field-error" role="alert"
+                [hidden]="!submitted() || !groupForm.durationWeeks().invalid()">Az időtartam 1 és 52 hét közé essen.</span>
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset class="form-section">
+      <legend>Edzők</legend>
+      <label class="field" for="lead-coach">
+        <span>Vezetőedző</span>
+        <select id="lead-coach" [value]="model().leadCoachId" (change)="changeLeadCoach($event)">
+          @for (coach of coaches(); track coach.id) {
+            <option [value]="coach.id">{{ coach.name }}</option>
+          }
+        </select>
+      </label>
+      <div class="choice-list">
+        <span class="field-label">További edzők</span>
+        @for (coach of coaches(); track coach.id) {
+          @if (coach.id !== model().leadCoachId) {
+            <label class="choice">
+              <input type="checkbox" [checked]="model().assistantCoachIds.includes(coach.id)"
+                     (change)="toggleAssistantCoach(coach.id, $event)" />
+              <span>{{ coach.name }}</span>
+            </label>
+          }
+        }
+      </div>
+    </fieldset>
+
+    <fieldset class="form-section">
+      <legend>Sportolók</legend>
+      <div class="choice-list athlete-list">
+        @for (athlete of athletes(); track athlete.id) {
+          <label class="choice">
+            <input type="checkbox" [checked]="model().athleteIds.includes(athlete.id)"
+                   (change)="toggleAthlete(athlete.id, $event)" />
+            <span>{{ athlete.name }}</span>
+          </label>
+        }
+      </div>
+    </fieldset>
+
+    <fieldset class="form-section">
+      <legend>Heti edzésrend</legend>
+      <p class="section-help">A csoportnak hetente több edzése is lehet. Később egy konkrét alkalom külön lemondható.</p>
+      <div class="schedule-list">
+        @for (schedule of groupForm.weeklySchedule; track schedule; let index = $index) {
+          <div class="schedule-row">
+            <label class="field" [for]="'weekday-' + index">
+              <span>Nap</span>
+              <select [id]="'weekday-' + index" [formField]="schedule.weekday"
+                      [attr.aria-invalid]="submitted() && schedule.weekday().invalid()"
+                      [attr.aria-describedby]="'weekday-error-' + index">
+                @for (day of weekdayOptions; track day.value) {
+                  <option [value]="day.value">{{ day.label }}</option>
+                }
+              </select>
+              <span class="field-error" [id]="'weekday-error-' + index" role="alert"
+                    [hidden]="!submitted() || !schedule.weekday().invalid()">Válassz napot.</span>
+            </label>
+            <label class="field" [for]="'time-' + index">
+              <span>Kezdés</span>
+              <input [id]="'time-' + index" type="time" [formField]="schedule.startTime"
+                     [attr.aria-invalid]="submitted() && schedule.startTime().invalid()"
+                     [attr.aria-describedby]="'time-error-' + index" />
+              <span class="field-error" [id]="'time-error-' + index" role="alert"
+                    [hidden]="!submitted() || !schedule.startTime().invalid()">Add meg a kezdést.</span>
+            </label>
+            <label class="field" [for]="'duration-' + index">
+              <span>Időtartam (perc)</span>
+              <input [id]="'duration-' + index" type="number"
+                     [formField]="schedule.durationMinutes"
+                     [attr.aria-invalid]="submitted() && schedule.durationMinutes().invalid()"
+                     [attr.aria-describedby]="'schedule-duration-error-' + index" />
+              <span class="field-error" [id]="'schedule-duration-error-' + index" role="alert"
+                    [hidden]="!submitted() || !schedule.durationMinutes().invalid()">15–240 perc lehet.</span>
+            </label>
+            <button class="icon-button remove-button" type="button" (click)="removeSchedule(index)"
+                    [disabled]="model().weeklySchedule.length === 1"
+                    [attr.aria-label]="'Edzésidőpont törlése: ' + (index + 1) + '. sor'">Törlés</button>
+          </div>
+        }
+      </div>
+      <button class="button button-secondary" type="button" (click)="addSchedule()">+ Heti időpont hozzáadása</button>
+    </fieldset>
+
+    <p class="selection-error" role="alert" [hidden]="!selectionError()">{{ selectionError() }}</p>
+    <div class="form-actions">
+      <a class="button button-secondary" routerLink="/admin/groups">Mégse</a>
+      <button class="button button-primary" type="submit">Csoport létrehozása</button>
+    </div>
+  </form>
+</section>

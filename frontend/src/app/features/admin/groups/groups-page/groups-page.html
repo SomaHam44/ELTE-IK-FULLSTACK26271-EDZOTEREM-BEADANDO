@@ -1,0 +1,59 @@
+<section class="page" aria-labelledby="page-title">
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">ADMINISZTRÁCIÓ</p>
+      <h1 id="page-title">Edzéscsoportok</h1>
+      <p class="subtitle">Csoportok, edzők, tagok és heti edzésrend egy helyen.</p>
+    </div>
+    <a class="button button-primary" routerLink="/admin/groups/new">+ Új csoport</a>
+  </div>
+
+  <div class="summary-row" aria-label="Csoport összesítő">
+    <div class="summary-card"><span>Összes csoport</span><strong>{{ groups().length }}</strong></div>
+    <div class="summary-card"><span>Aktív edzésalkalom</span><strong>{{ sessions().length }}</strong></div>
+  </div>
+
+  @if (groups().length === 0) {
+    <div class="empty-state">
+      <h2>Még nincs edzéscsoport</h2>
+      <p>Hozd létre az első csoportot, és add meg a heti edzésrendjét.</p>
+      <a class="button button-primary" routerLink="/admin/groups/new">Csoport létrehozása</a>
+    </div>
+  } @else {
+    <div class="group-list">
+      @for (group of groups(); track group.id) {
+        <article class="group-card">
+          <div class="group-card-top">
+            <div>
+              <span class="status status-active">{{ group.status === 'active' ? 'Aktív' : group.status }}</span>
+              <h2>{{ group.name }}</h2>
+              <p class="muted">Kezdés: {{ group.startDate }} · {{ group.durationWeeks }} hét</p>
+            </div>
+            <a class="button button-secondary" [routerLink]="['/admin/groups', group.id]">
+              Adatlap <span aria-hidden="true">→</span>
+            </a>
+          </div>
+          <div class="group-meta">
+            <div>
+              <span class="meta-label">Vezetőedző</span>
+              <strong>{{ group.leadCoach.name }}</strong>
+            </div>
+            <div>
+              <span class="meta-label">Edzők</span>
+              <strong>{{ group.coaches.length }}</strong>
+            </div>
+            <div>
+              <span class="meta-label">Sportolók</span>
+              <strong>{{ group.athletes.length }}</strong>
+            </div>
+          </div>
+          <div class="schedule-chips" aria-label="Heti edzésrend">
+            @for (rule of group.weeklySchedule; track rule.id) {
+              <span class="schedule-chip">{{ weekdayName(rule.weekday) }} · {{ rule.startTime }} · {{ rule.durationMinutes }} perc</span>
+            }
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>

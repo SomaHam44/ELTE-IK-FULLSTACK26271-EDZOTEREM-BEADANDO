@@ -1,0 +1,95 @@
+<main class="login-page">
+  <div class="login-layout">
+    <section class="brand-panel" aria-labelledby="brand-title">
+      <div class="brand-header">
+        <div class="brand-mark" aria-hidden="true">PF</div>
+
+        <div class="brand-name" aria-label="Peak Form">
+          <span>PEAK</span>
+          <strong>FORM</strong>
+        </div>
+      </div>
+
+      <div class="brand-copy">
+        <p class="eyebrow">EDZÉS • FEJLŐDÉS • KÖZÖSSÉG</p>
+
+        <h1 id="brand-title">
+          Lépj szintet.
+          <span>Edzésről edzésre.</span>
+        </h1>
+
+
+      </div>
+
+      <footer class="brand-footer">
+        <span>PEAK FORM</span>
+      </footer>
+    </section>
+
+    <section class="form-panel" aria-labelledby="login-title">
+      <div class="form-content">
+        <h2 id="login-title">Jelentkezz be</h2>
+
+        <p class="form-intro">
+          Add meg a fiókodhoz tartozó e-mail-címet és jelszót.
+        </p>
+
+        <form
+          class="login-form"
+          [attr.aria-busy]="isSubmitting()"
+          (submit)="$event.preventDefault(); submit()"
+        >
+          <div class="form-field">
+            <label for="email">E-mail-cím</label>
+
+            <input
+              id="email"
+              type="email"
+              autocomplete="username"
+              inputmode="email"
+              placeholder="nev@email.hu"
+              [formField]="loginForm.email"
+            />
+          </div>
+
+          <div class="form-field">
+            <label for="password">Jelszó</label>
+
+            <input
+              id="password"
+              type="password"
+              autocomplete="current-password"
+              placeholder="Add meg a jelszavad"
+              [formField]="loginForm.password"
+            />
+          </div>
+
+          @if (errorMessage()) {
+            <p class="error-message" role="alert">
+              {{ errorMessage() }}
+            </p>
+          }
+
+          <button class="submit-button" type="submit" [disabled]="isSubmitting()">
+            @if (isSubmitting()) {
+              <span>Bejelentkezés…</span>
+            } @else {
+              <span>Bejelentkezés</span>
+              <span class="button-arrow" aria-hidden="true">→</span>
+            }
+          </button>
+        </form>
+
+        <p class="account-help">
+          Nincs még hozzáférésed?
+          <span>Kérj fiókot a terem adminisztrátorától.</span>
+        </p>
+
+        <footer class="login-footer">
+          <span>Peak Form</span>
+          <span>Edzés. Fejlődés. Közösség.</span>
+        </footer>
+      </div>
+    </section>
+  </div>
+</main>

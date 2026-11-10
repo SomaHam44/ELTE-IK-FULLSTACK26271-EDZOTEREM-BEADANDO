@@ -1,0 +1,36 @@
+.skip-link { position: fixed; top: 8px; left: 8px; z-index: 10; transform: translateY(-150%); padding: 10px 14px; border-radius: 8px; background: #182230; color: #fff; }
+.skip-link:focus { transform: translateY(0); }
+.app-frame { min-height: 100dvh; display: grid; grid-template-columns: 248px minmax(0, 1fr); }
+.sidebar { position: sticky; top: 0; display: flex; height: 100dvh; flex-direction: column; padding: 24px 16px 18px; background: #182230; color: #fff; }
+.brand { display: flex; align-items: center; gap: 12px; padding: 0 8px; color: #fff; text-decoration: none; }
+.brand-mark { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 13px; background: #c5f23a; color: #182230; font-weight: 900; letter-spacing: -0.08em; }
+.brand strong, .brand small, .user-copy strong, .user-copy small { display: block; }
+.brand small { margin-top: 3px; color: #c1c9d0; font-size: 0.65rem; letter-spacing: 0.12em; }
+.nav-label { margin: 42px 10px 10px; color: #c1c9d0; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.12em; }
+nav { display: grid; gap: 6px; }
+.nav-link { display: flex; min-height: 46px; align-items: center; gap: 12px; padding: 0 12px; border-radius: 10px; color: #e2e7eb; text-decoration: none; }
+.nav-link:hover, .nav-link.active { background: #2a3744; color: #fff; }
+.nav-link.active { box-shadow: inset 3px 0 #c5f23a; }
+.nav-dot { width: 8px; height: 8px; border: 2px solid #c5f23a; border-radius: 50%; }
+.sidebar-foot { display: flex; align-items: center; gap: 10px; margin-top: auto; padding: 14px 8px 0; border-top: 1px solid #394550; }
+.avatar { display: grid; width: 38px; height: 38px; flex: 0 0 auto; place-items: center; border-radius: 50%; background: #394550; color: #fff; font-weight: 800; }
+.user-copy { min-width: 0; }
+.user-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.user-copy small { margin-top: 4px; color: #c1c9d0; }
+.workspace { min-width: 0; }
+.topbar { display: flex; min-height: 68px; align-items: center; justify-content: space-between; gap: 16px; padding: 0 clamp(18px, 4vw, 48px); border-bottom: 1px solid #e3e8eb; background: #fff; }
+.topbar-label { color: #52616e; font-size: 0.9rem; }
+.text-button { min-height: 42px; padding: 0 12px; border: 0; border-radius: 8px; background: transparent; color: #182230; font-weight: 700; cursor: pointer; }
+.text-button:hover { background: #f1f4f5; }
+.main-content { width: min(1240px, 100%); margin: 0 auto; padding: clamp(22px, 4vw, 48px); }
+
+@media (max-width: 760px) {
+  .app-frame { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; padding: 14px 16px 10px; }
+  .brand { padding: 0; }
+  .nav-label, .sidebar-foot { display: none; }
+  nav { display: flex; overflow-x: auto; gap: 6px; margin-top: 14px; padding-bottom: 2px; }
+  .nav-link { min-height: 40px; flex: 0 0 auto; padding: 0 12px; }
+  .topbar { min-height: 54px; }
+  .main-content { padding: 22px 16px; }
+}
