@@ -1,0 +1,34 @@
+<a class="skip-link" href="#main-content">Ugrás a tartalomra</a>
+<div class="app-frame">
+  <aside class="sidebar" aria-label="Peak Form menü">
+    <a class="brand" [routerLink]="homeLink()" aria-label="Peak Form kezdőlap">
+      <span class="brand-mark" aria-hidden="true">PF</span>
+      <span><strong>Peak Form</strong><small>TRAINING CLUB</small></span>
+    </a>
+
+    <p class="nav-label">MENÜ</p>
+    <nav aria-label="Fő navigáció">
+      @for (item of navigation(); track item.path) {
+        <a class="nav-link" [routerLink]="item.path" routerLinkActive="active"
+           [routerLinkActiveOptions]="{ exact: true }">
+          <span class="nav-dot" aria-hidden="true"></span>{{ item.label }}
+        </a>
+      }
+    </nav>
+
+    <div class="sidebar-foot">
+      <span class="avatar" aria-hidden="true">{{ initials() }}</span>
+      <span class="user-copy"><strong>{{ user()?.name }}</strong><small>{{ roleLabel() }}</small></span>
+    </div>
+  </aside>
+
+  <div class="workspace">
+    <header class="topbar">
+      <span class="topbar-label">Peak Form</span>
+      <button class="text-button" type="button" (click)="signOut()">Kilépés</button>
+    </header>
+    <main id="main-content" class="main-content" tabindex="-1">
+      <router-outlet />
+    </main>
+  </div>
+</div>

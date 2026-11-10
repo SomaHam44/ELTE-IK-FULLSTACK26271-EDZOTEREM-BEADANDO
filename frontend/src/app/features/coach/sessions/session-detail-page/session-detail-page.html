@@ -1,0 +1,82 @@
+@if (session(); as currentSession) {
+  @if (group(); as currentGroup) {
+    <section class="page" aria-labelledby="page-title">
+      <a class="back-link" routerLink="/coach/dashboard">← Vissza az edzéseimhez</a>
+      <div class="page-heading">
+        <div>
+          <p class="eyebrow">EDZÉSKEZELÉS</p>
+          <h1 id="page-title">{{ currentGroup.name }}</h1>
+          <p class="subtitle">{{ currentSession.startsAt | date:'EEEE, yyyy. MMMM d. · HH:mm' : 'Europe/Budapest' }}</p>
+        </div>
+        @if (currentSession.status === 'cancelled') {
+          <span class="status status-cancelled">Lemondva</span>
+        } @else {
+          <span class="status status-scheduled">Tervezett</span>
+        }
+      </div>
+
+      <article class="panel coach-panel">
+        <div><span class="meta-label">Edzők</span><strong>{{ coachNames(currentSession.coaches) }}</strong></div>
+        <div><span class="meta-label">Résztvevők</span><strong>{{ currentGroup.athletes.length }} sportoló</strong></div>
+      </article>
+
+      @if (currentSession.status === 'cancelled') {
+        <div class="notice notice-danger" role="status">
+          <strong>Ezt az alkalmat lemondták.</strong>
+          <span>{{ currentSession.cancellationReason }}</span>
+        </div>
+      } @else {
+        <div class="section-heading"><div><p class="eyebrow">JELENLÉT</p><h2>Sportolók és visszajelzések</h2></div></div>
+        <p class="sr-only" aria-live="polite">{{ message() }}</p>
+
+        <div class="athlete-list">
+          @for (athlete of currentGroup.athletes; track athlete.id) {
+            <article class="athlete-card">
+              <div class="athlete-heading">
+                <span class="avatar" aria-hidden="true">{{ athlete.name.slice(0, 1) }}</span>
+                <h3>{{ athlete.name }}</h3>
+              </div>
+              <label class="field" [for]="'attendance-' + athlete.id">Jelenléti állapot</label>
+              <select class="control" [id]="'attendance-' + athlete.id"
+                      [value]="attendanceStatus(athlete.id)"
+                      (change)="markAttendance(athlete.id, $event)">
+                <option value="">Még nincs jelölve</option>
+                @for (option of statusOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+
+              @if (feedbackFor(athlete.id).note || feedbackFor(athlete.id).rating !== null) {
+                <div class="saved-feedback">
+                  <strong>Korábbi visszajelzés</strong>
+                  @if (feedbackFor(athlete.id).rating !== null) { <span>Értékelés: {{ feedbackFor(athlete.id).rating }}/5</span> }
+                  @if (feedbackFor(athlete.id).note) { <p>{{ feedbackFor(athlete.id).note }}</p> }
+                </div>
+              }
+
+              <div class="feedback-form">
+                <label class="field" [for]="'rating-' + athlete.id">Értékelés (1–5)</label>
+                <input class="control" [id]="'rating-' + athlete.id" type="number" min="1" max="5" step="1" required
+                       [value]="feedbackDraft(athlete.id).rating"
+                       (input)="updateRating(athlete.id, $event)" />
+                <label class="field" [for]="'note-' + athlete.id">Edzői megjegyzés</label>
+                <textarea class="control" [id]="'note-' + athlete.id" rows="3"
+                          [value]="feedbackDraft(athlete.id).note" (input)="updateNote(athlete.id, $event)"
+                          placeholder="Rövid, építő visszajelzés"></textarea>
+                <button class="button button-secondary" type="button" (click)="saveFeedback(athlete.id)">
+                  Visszajelzés mentése
+                </button>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </section>
+  }
+} @else {
+  <section class="empty-state" aria-labelledby="missing-session-title">
+    <h1 id="missing-session-title">Az edzés nem található</h1>
+    <p>Lehet, hogy az alkalom nem létezik a bemutatóadatok között.</p>
+    <a class="button button-primary" routerLink="/coach/dashboard">Vissza az edzéseimhez</a>
+  </section>
+}

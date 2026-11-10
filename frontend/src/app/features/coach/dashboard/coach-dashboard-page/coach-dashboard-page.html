@@ -1,0 +1,35 @@
+<section class="page" aria-labelledby="page-title">
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">EDZŐI FELÜLET</p>
+      <h1 id="page-title">Szia, {{ user()?.name }}!</h1>
+      <p class="subtitle">Itt találod a következő edzéseidet és a jelenléti teendőket.</p>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <article class="stat-card"><span>Hozzád rendelt alkalmak</span><strong>{{ sessions().length }}</strong></article>
+    <article class="stat-card accent-card"><span>Rögzített jelenlétek</span><strong>{{ attendanceCount() }}</strong></article>
+  </div>
+
+  <div class="section-heading"><div><p class="eyebrow">ÓRAREND</p><h2>Következő edzéseid</h2></div></div>
+  <div class="session-list">
+    @for (session of sessions(); track session.id) {
+      <article class="session-card">
+        <div class="date-block"><strong>{{ session.startsAt | date:'dd' : 'Europe/Budapest' }}</strong><span>{{ session.startsAt | date:'MM.yyyy' : 'Europe/Budapest' }}</span></div>
+        <div class="session-copy">
+          <strong>{{ groupName(session.groupId) }}</strong>
+          <span>{{ session.startsAt | date:'EEEE, HH:mm' : 'Europe/Budapest' }}</span>
+          <small>{{ session.coaches.length }} edző · jelenlét és visszajelzés</small>
+        </div>
+        @if (session.status === 'cancelled') {
+          <span class="status status-cancelled">Lemondva</span>
+        } @else {
+          <a class="button button-primary" [routerLink]="['/coach/sessions', session.id]">Edzés megnyitása</a>
+        }
+      </article>
+    } @empty {
+      <div class="empty-state"><h2>Nincs hozzád rendelt edzés</h2><p>Ha egy csoporthoz edzőként hozzárendelnek, itt jelennek meg az alkalmak.</p></div>
+    }
+  </div>
+</section>

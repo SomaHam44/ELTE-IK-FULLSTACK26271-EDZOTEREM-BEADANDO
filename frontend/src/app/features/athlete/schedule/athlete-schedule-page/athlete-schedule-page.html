@@ -1,0 +1,62 @@
+<section class="page" aria-labelledby="page-title">
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">SPORTOLÓI FELÜLET</p>
+      <h1 id="page-title">Saját órarendem</h1>
+      <p class="subtitle">Szia, {{ user()?.name }}! Itt találod a csoportod edzéseit és visszajelzéseit.</p>
+    </div>
+  </div>
+
+  @if (sessions().length === 0) {
+    <div class="empty-state">
+      <h2>Még nincs megjeleníthető edzés</h2>
+      <p>Ha egy csoport tagja vagy, az alkalmak automatikusan megjelennek itt.</p>
+    </div>
+  } @else {
+    <div class="schedule-list">
+      @for (session of sessions(); track session.id) {
+        <article class="session-card">
+          <div class="date-block">
+            <strong>{{ session.startsAt | date:'dd' : 'Europe/Budapest' }}</strong>
+            <span>{{ session.startsAt | date:'MM.yyyy' : 'Europe/Budapest' }}</span>
+          </div>
+          <div class="session-main">
+            <div class="session-heading">
+              <div>
+                <h2>{{ groupName(session.groupId) }}</h2>
+                <p>{{ session.startsAt | date:'EEEE · HH:mm' : 'Europe/Budapest' }}</p>
+              </div>
+              @if (session.status === 'cancelled') {
+                <span class="status status-cancelled">Lemondva</span>
+              } @else {
+                <span class="status status-scheduled">Tervezett</span>
+              }
+            </div>
+
+            @if (session.status === 'cancelled') {
+              <p class="cancellation-reason"><strong>Indok:</strong> {{ session.cancellationReason }}</p>
+            }
+
+            <details class="details">
+              <summary>Edzők és visszajelzés</summary>
+              <p class="coach-line"><strong>Edzők:</strong> {{ coachNames(session.coaches) }}</p>
+              @if (feedbackFor(session); as feedback) {
+                @if (feedback.rating !== null || feedback.note) {
+                  <div class="feedback">
+                    <strong>Edzői visszajelzés</strong>
+                    @if (feedback.rating !== null) { <span>Értékelés: {{ feedback.rating }}/5</span> }
+                    @if (feedback.note) { <p>{{ feedback.note }}</p> }
+                  </div>
+                } @else {
+                  <p class="muted">Ehhez az alkalomhoz még nincs edzői visszajelzés.</p>
+                }
+              } @else {
+                <p class="muted">Ehhez az alkalomhoz még nincs edzői visszajelzés.</p>
+              }
+            </details>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>

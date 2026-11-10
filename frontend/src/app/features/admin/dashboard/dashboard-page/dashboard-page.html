@@ -1,0 +1,33 @@
+<section class="page" aria-labelledby="page-title">
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">ADMINISZTRÁCIÓ</p>
+      <h1 id="page-title">Áttekintő</h1>
+      <p class="subtitle">A Peak Form csoportjainak és következő edzéseinek összefoglalója.</p>
+    </div>
+    <a class="button button-primary" routerLink="/admin/groups/new">+ Új csoport</a>
+  </div>
+
+  <div class="stat-grid" aria-label="Rendszer összesítő">
+    <article class="stat-card"><span>Aktív csoport</span><strong>{{ groups().length }}</strong><small>edzésprogram</small></article>
+    <article class="stat-card"><span>Következő edzés</span><strong>{{ upcomingSessions().length }}</strong><small>közelgő alkalom</small></article>
+    <article class="stat-card accent-card"><span>Sportolók</span><strong>{{ athleteCount() }}</strong><small>csoporttag</small></article>
+  </div>
+
+  <div class="section-heading">
+    <div><p class="eyebrow">PROGRAM</p><h2>Közelgő edzések</h2></div>
+    <a class="inline-link" routerLink="/admin/groups">Csoportok megnyitása →</a>
+  </div>
+
+  <div class="session-list">
+    @for (session of upcomingSessions(); track session.id) {
+      <article class="session-card">
+        <div class="date-block"><strong>{{ session.startsAt | date:'dd' : 'Europe/Budapest' }}</strong><span>{{ session.startsAt | date:'MM.yyyy' : 'Europe/Budapest' }}</span></div>
+        <div class="session-copy"><strong>{{ groupName(session.groupId) }}</strong><span>{{ session.startsAt | date:'EEEE, HH:mm' : 'Europe/Budapest' }}</span></div>
+        <span class="status status-scheduled">Tervezett</span>
+      </article>
+    } @empty {
+      <div class="empty-state"><p>Jelenleg nincs közelgő edzésalkalom.</p></div>
+    }
+  </div>
+</section>
